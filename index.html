@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overlay</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: rgba(0, 0, 0, 0.40);;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #overlay {
+            position: fixed;
+            display: none; /* Initially hidden */
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.1);
+            transition: opacity 0.1s ease, visibility 0.1s; /* Transparent background */
+            z-index: 2;
+            cursor: pointer;
+            pointer-events: none;
+        }
+        #overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* #text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            font-size: 16px;
+            color: white;
+            transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            text-align: center;
+            line-height: 1.5;
+        } */
+
+        #response-box {
+            width: 95%;
+            max-width: 1000px;
+            max-height: 95%;
+            overflow-y: auto;
+            background: rgba(25, 25, 25, 0.1);/* Transparent background */
+            color: #ffffff; /* Bright white text */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            font-size: 14px;
+            line-height: 1.5;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Text shadow for readability */
+        }
+
+        pre,code {
+            background: transparent;
+            padding: 10px;
+            border-radius: 6px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            font-family: 'Fira Code', Consolas, 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <!-- Transparent Overlay -->
+    <div id="overlay" onclick="off()">
+        <div id="text">Overlay Text</div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="response-box">Waiting for screenshot...</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        ipcRenderer.on('analysis-result', (event, result) => {
+            document.getElementById('response-box').innerHTML = marked.parse(result);
+        });
+
+        ipcRenderer.on('update-response', (event, message) => {
+            document.getElementById('response-box').textContent = message;
+        });
+
+        // Overlay control functions
+        function on() {
+            document.getElementById("overlay").style.display = "block";
+        }
+
+        function off() {
+            document.getElementById("overlay").style.display = "none";
+        }
+
+        ipcRenderer.on('scroll-up', () => {
+            const responseBox = document.getElementById('response-box');
+            responseBox.scrollBy({ top: -50, behavior: 'smooth' }); // Scroll up
+        });
+
+        ipcRenderer.on('scroll-down', () => {
+            const responseBox = document.getElementById('response-box');
+            responseBox.scrollBy({ top: 50, behavior: 'smooth' }); // Scroll down
+        });
+
+        
+
+        // Example: Show overlay when receiving a specific event
+        ipcRenderer.on('show-overlay', (event, message) => {
+            document.getElementById("text").textContent = message;
+            on();
+        });
+
+        ipcRenderer.on('hide-overlay', () => {
+            off();
+        });
+    </script>
+</body>
+</html>

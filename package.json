@@ -1,0 +1,10 @@
+{
+    "main": "main.js",
+    "scripts": {
+        "start": "electron ."
+    },
+    "dependencies": {
+        "@google/generative-ai": "^0.24.0",
+        "screenshot-desktop": "^1.15.1"
+    }
+}
