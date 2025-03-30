@@ -1,5 +1,3 @@
-
-
 const { app, BrowserWindow, globalShortcut } = require('electron');
 const screenshot = require('screenshot-desktop');
 const path = require('path');
